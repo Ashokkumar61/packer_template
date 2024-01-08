@@ -21,5 +21,11 @@ jobs:
         packer validate packer.json
         packer build packer.json
 
-    - name: Upload AMI ID to GitHub
-      run: echo "::set-output name=AMI_ID::$(cat packer-manifest.json | jq -r '.builds[0].artifact_id' | cut -d':' -f2)"
+    - name: Extract AMI ID
+      id: extract-ami-id
+      run: |
+        AMI_ID=$(cat packer-manifest.json | jq -r '.builds[0].artifact_id' | cut -d':' -f2)
+        echo "AMI_ID=$AMI_ID" >> $GITHUB_ENV
+
+    - name: Print AMI ID
+      run: echo "AMI ID: ${{ env.AMI_ID }}"
