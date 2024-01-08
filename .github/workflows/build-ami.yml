@@ -1,0 +1,25 @@
+name: Build AMI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-ami:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Set up Packer
+      uses: hashicorp/setup-packer@v1
+
+    - name: Build AMI
+      run: |
+        packer validate packer.json
+        packer build packer.json
+
+    - name: Upload AMI ID to GitHub
+      run: echo "::set-output name=AMI_ID::$(cat packer-manifest.json | jq -r '.builds[0].artifact_id' | cut -d':' -f2)"
